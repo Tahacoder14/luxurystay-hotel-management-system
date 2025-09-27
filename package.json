@@ -1,0 +1,14 @@
+
+  {
+  "name": "mern-hotel-management",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm start --prefix server",
+    "client": "npm start --prefix client",
+    "install-deps": "npm install && npm install --prefix client && npm install --prefix server"
+      },
+       "dependencies": {
+    "concurrently": "^9.2.1"
+}
+  }

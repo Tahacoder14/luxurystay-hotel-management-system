@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'react-datepicker/dist/react-datepicker.css';
+
+/* --- THE DEFINITIVE RESPONSIVE FIX (THE SILVER BULLET) --- */
+/* This is the industry-standard method to prevent all horizontal overflow issues. */
+html, body, #root {
+  /* Set the width to 100% of the available space, NOT the viewport width. */
+  width: 100%;
+  
+  /* CRITICAL: This command tells the browser to NEVER allow horizontal scrolling on the main document. */
+  overflow-x: hidden;
+  
+  /* A smooth scroll behavior is a professional touch. */
+  scroll-behavior: smooth;
+}
