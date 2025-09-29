@@ -14,7 +14,9 @@ export const createApplication = async (req, res, next) => {
         }
         const applicationData = {
             ...req.body,
-            cvPath: `/${req.file.path.replace(/\\/g, '/')}`
+            cv: req.file.buffer,           // Store the file as Buffer
+            cvType: req.file.mimetype,     // Store the MIME type
+            // cvPath is now optional/legacy, you can leave it out or set to null
         };
         const application = new Application(applicationData);
         await application.save();
@@ -56,18 +58,12 @@ export const processApplication = async (req, res, next) => {
         if (!applicantUser) return res.status(404).json({ message: 'Applicant user profile not found.'});
 
         if (action === 'hire') {
-            // 1. Update the User's role to Staff (0) and set staff details
             applicantUser.role = 0;
             applicantUser.staffDetails = { title: staffTitle || application.job.title, hireDate: new Date() };
             await applicantUser.save();
-            
-            // 2. Update the Job posting to 'Filled'
             await Job.findByIdAndUpdate(application.job._id, { status: 'Filled' });
-            
-            // 3. Update the Application status to 'Hired'
             application.status = 'Hired';
             await application.save();
-            
             res.json({ message: 'Applicant hired successfully and moved to staff!' });
 
         } else if (action === 'reject') {
