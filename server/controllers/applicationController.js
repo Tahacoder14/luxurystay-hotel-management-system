@@ -1,4 +1,4 @@
-import Application from '../models/application.js';
+import Application from '../models/Application.js';
 import User from '../models/User.js';
 import Job from '../models/job.js';
 
