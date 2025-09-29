@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ApplicationSchema = new mongoose.Schema({
     // Link to the specific job being applied for. 'ref' is crucial for population.
@@ -44,4 +44,4 @@ const ApplicationSchema = new mongoose.Schema({
     timestamps: true // Automatically adds 'createdAt' and 'updatedAt' fields
 });
 
-module.exports = mongoose.model('Application', ApplicationSchema);
+export default mongoose.model('Application', ApplicationSchema);

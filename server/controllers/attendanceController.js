@@ -1,8 +1,8 @@
-const Attendance = require('../models/Attendance');
-const { format } = require('date-fns');
+import Attendance from '../models/Attendance.js';
+import { format } from 'date-fns';
 
 // @desc    Staff member checks in for the day
-exports.checkIn = async (req, res, next) => {
+export const checkIn = async (req, res, next) => {
     try {
         const today = format(new Date(), 'yyyy-MM-dd');
         const existingRecord = await Attendance.findOne({ staffMember: req.user.id, date: today });
@@ -16,7 +16,7 @@ exports.checkIn = async (req, res, next) => {
 };
 
 // @desc    Staff member checks out for the day
-exports.checkOut = async (req, res, next) => {
+export const checkOut = async (req, res, next) => {
     try {
         const today = format(new Date(), 'yyyy-MM-dd');
         const record = await Attendance.findOne({ staffMember: req.user.id, date: today });
@@ -30,7 +30,7 @@ exports.checkOut = async (req, res, next) => {
 };
 
 // @desc    Admin gets all attendance records
-exports.getAllAttendance = async (req, res, next) => {
+export const getAllAttendance = async (req, res, next) => {
     try {
         const records = await Attendance.find({}).populate('staffMember', 'name').sort({ checkInTime: -1 });
         res.json(records);

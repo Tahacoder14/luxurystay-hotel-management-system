@@ -1,5 +1,5 @@
-const Attendance = require('../models/Attendance');
-const { format } = require('date-fns');
+import Attendance from '../models/Attendance.js';
+import { format } from 'date-fns';
 
 /**
  * A professional service class to handle all attendance-related business logic.
@@ -47,4 +47,4 @@ class AttendanceService {
     }
 }
 
-module.exports = new AttendanceService();
+export default new AttendanceService();

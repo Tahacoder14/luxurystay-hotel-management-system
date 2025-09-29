@@ -1,11 +1,11 @@
-const User = require('../models/User');
+import User from '../models/User.js';
 
 /**
  * @desc    Admin creates a new staff member
  * @route   POST /api/users/staff
  * @access  Private/Admin
  */
-exports.createStaff = async (req, res, next) => {
+export const createStaff = async (req, res, next) => {
     const { name, email, password, role, title, department } = req.body;
 
     try {
@@ -45,7 +45,7 @@ exports.createStaff = async (req, res, next) => {
  * @route   GET /api/users/staff
  * @access  Private/Admin
  */
-exports.getStaff = async (req, res, next) => {
+export const getStaff = async (req, res, next) => {
     try {
         // Find all users whose role is NOT 'Guest'. This is the correct logic.
         const staff = await User.find({ role: { $ne: 'Guest' } }).select('-password');
@@ -60,7 +60,7 @@ exports.getStaff = async (req, res, next) => {
  * @route   GET /api/users/guests
  * @access  Private/Admin
  */
-exports.getGuests = async (req, res, next) => {
+export const getGuests = async (req, res, next) => {
     try {
         // Find all users whose role is specifically 'Guest'.
         const guests = await User.find({ role: 'Guest' }).select('-password');
@@ -75,7 +75,7 @@ exports.getGuests = async (req, res, next) => {
  * @route   PUT /api/users/:id/status
  * @access  Private/Admin
  */
-exports.updateUserStatus = async (req, res, next) => {
+export const updateUserStatus = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id);
         if (user) {
@@ -95,7 +95,7 @@ exports.updateUserStatus = async (req, res, next) => {
  * @route   PUT /api/users/:id/role
  * @access  Private/Admin
  */
-exports.updateUserRole = async (req, res, next) => {
+export const updateUserRole = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id);
         if (user) {
@@ -115,7 +115,7 @@ exports.updateUserRole = async (req, res, next) => {
  * @route   DELETE /api/users/:id
  * @access  Private/Admin
  */
-exports.deleteUser = async (req, res, next) => {
+export const deleteUser = async (req, res, next) => {
     try {
         // Prevent an admin from deleting their own account
         if (req.user.id === req.params.id) {

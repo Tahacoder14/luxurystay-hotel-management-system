@@ -1,16 +1,16 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // --- THE FIX IS HERE ---
 // Ensure ALL functions used below are correctly imported.
-const { 
+import { 
     createApplication, 
     getAllApplications, 
     processApplication 
-} = require('../controllers/applicationController');
+} from '../controllers/applicationController.js';
 
-const { protect, admin } = require('../middleware/authMiddleware');
-const cvUpload = require('../middleware/cvUploadMiddleware');
+import { protect, admin } from '../middleware/authMiddleware.js';
+import cvUpload from '../middleware/cvUploadMiddleware.js';
 
 // Route for a user to submit a new application
 // This uses the 'cvUpload' middleware to handle the file first.
@@ -22,4 +22,4 @@ router.get('/', protect, admin, getAllApplications);
 // Route for an admin to process an application (hire/reject)
 router.put('/:applicationId/process', protect, admin, processApplication);
 
-module.exports = router;
+export default router;

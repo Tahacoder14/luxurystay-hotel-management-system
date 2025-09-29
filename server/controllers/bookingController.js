@@ -1,12 +1,12 @@
-const BookingService = require('../services/bookingService');
-const Booking = require('../models/Booking'); // Import the model for direct use if needed
+import BookingService from '../services/bookingService.js';
+import Booking from '../models/Booking.js';
 
 /**
  * @desc    Create a new booking
  * @route   POST /api/bookings
  * @access  Private (User must be logged in)
  */
-exports.createBooking = async (req, res, next) => {
+export const createBooking = async (req, res, next) => {
     try {
         // The service layer handles the complex logic of checking for availability.
         // The controller simply passes the data along.
@@ -24,7 +24,7 @@ exports.createBooking = async (req, res, next) => {
  * @route   GET /api/bookings/mybookings
  * @access  Private (User must be logged in)
  */
-exports.getMyBookings = async (req, res, next) => {
+export const getMyBookings = async (req, res, next) => {
     try {
         const bookings = await BookingService.getBookingsForUser(req.user.id);
         res.json(bookings);
@@ -38,7 +38,7 @@ exports.getMyBookings = async (req, res, next) => {
  * @route   GET /api/bookings/:id
  * @access  Private (User must be logged in)
  */
-exports.getBookingById = async (req, res, next) => {
+export const getBookingById = async (req, res, next) => {
     try {
         const booking = await Booking.findById(req.params.id)
             .populate('room', 'name type price imageUrl') // Get details from the Room model
@@ -69,7 +69,7 @@ exports.getBookingById = async (req, res, next) => {
  * @route   GET /api/bookings
  * @access  Private/Admin
  */
-exports.getAllBookings = async (req, res, next) => {
+export const getAllBookings = async (req, res, next) => {
     try {
         const bookings = await BookingService.getAllBookings();
         res.json(bookings);
@@ -83,7 +83,7 @@ exports.getAllBookings = async (req, res, next) => {
  * @route   PUT /api/bookings/:id/checkin
  * @access  Private/Admin
  */
-exports.checkInBooking = async (req, res, next) => {
+export const checkInBooking = async (req, res, next) => {
     try {
         const booking = await BookingService.checkIn(req.params.id);
         res.json({ message: 'Guest checked in successfully.', booking });
@@ -97,7 +97,7 @@ exports.checkInBooking = async (req, res, next) => {
  * @route   PUT /api/bookings/:id/checkout
  * @access  Private/Admin
  */
-exports.checkOutBooking = async (req, res, next) => {
+export const checkOutBooking = async (req, res, next) => {
     try {
         const booking = await BookingService.checkOut(req.params.id);
         res.json({ message: 'Guest checked out successfully.', booking });

@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { getAllJobs, createJob } = require('../controllers/jobController');
-const { protect, admin } = require('../middleware/authMiddleware');
+import { getAllJobs, createJob } from '../controllers/jobController.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 router.get('/', getAllJobs); // Public route to see jobs
 router.post('/', protect, admin, createJob); // Protected admin route
 
-module.exports = router;
+export default router;

@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { getDashboardData } = require('../controllers/dashboardController');
-const { protect, admin } = require('../middleware/authMiddleware');
+import { getDashboardData } from '../controllers/dashboardController.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 // A single, efficient endpoint to get all dashboard data at once
 router.get('/', protect, admin, getDashboardData);
 
-module.exports = router;
+export default router;

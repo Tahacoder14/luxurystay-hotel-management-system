@@ -1,6 +1,6 @@
-const Room = require('../models/Room');
-const Booking = require('../models/Booking');
-const User = require('../models/User');
+import Room from  '../models/Room.js';
+import Booking from '../models/Booking.js';
+import User from '../models/User.js';
 
 class DashboardService {
     async getStats() {
@@ -30,4 +30,4 @@ class DashboardService {
         return { totalRooms, occupiedRooms, occupancyRate, todaysCheckIns, todaysRevenue, recentGuests };
     }
 }
-module.exports = new DashboardService();
+export default new DashboardService();

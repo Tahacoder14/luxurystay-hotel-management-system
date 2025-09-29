@@ -1,13 +1,13 @@
-const Application = require('../models/Application');
-const User = require('../models/User');
-const Job = require('../models/Job');
+import Application from '../models/Application.js';
+import User from '../models/User.js';
+import Job from '../models/Job.js';
 
 /**
  * @desc    Submit a new job application
  * @route   POST /api/applications
  * @access  Public
  */
-exports.createApplication = async (req, res, next) => {
+export const createApplication = async (req, res, next) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'A CV file is required.' });
@@ -29,7 +29,7 @@ exports.createApplication = async (req, res, next) => {
  * @route   GET /api/applications
  * @access  Private/Admin
  */
-exports.getAllApplications = async (req, res, next) => {
+export const getAllApplications = async (req, res, next) => {
     try {
         const applications = await Application.find({}).populate('job', 'title').sort({ createdAt: -1 });
         res.json(applications);
@@ -43,7 +43,7 @@ exports.getAllApplications = async (req, res, next) => {
  * @route   PUT /api/applications/:applicationId/process
  * @access  Private/Admin
  */
-exports.processApplication = async (req, res, next) => {
+export const processApplication = async (req, res, next) => {
     const { applicationId } = req.params;
     const { action, staffTitle } = req.body;
 

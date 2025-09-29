@@ -1,5 +1,5 @@
-const Booking = require('../models/Booking');
-const Room = require('../models/Room');
+import Booking from '../models/Booking.js';
+import Room from  '../models/Room.js';
 
 class BookingService {
     // This is a critical function to prevent double-booking
@@ -50,4 +50,4 @@ class BookingService {
     }
 }
 
-module.exports = new BookingService();
+export default new BookingService();

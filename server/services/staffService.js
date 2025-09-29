@@ -1,6 +1,6 @@
-const Attendance = require('../models/Attendance');
-const Update = require('../models/Update');
-const { format } = require('date-fns');
+import Attendance from '../models/Attendance.js';
+import Update from '../models/Update.js';
+import { format } from 'date-fns';
 
 class StaffService {
     /**
@@ -31,4 +31,4 @@ class StaffService {
     }
 }
 
-module.exports = new StaffService();
+export default new StaffService();

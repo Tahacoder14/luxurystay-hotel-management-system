@@ -1,7 +1,7 @@
-const Room = require('../models/Room');
-const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
+import Room from '../models/Room.js';
+import sharp from 'sharp';
+import fs from 'fs';
+import path from 'path';
 
 class RoomService {
     async getAll() {
@@ -83,4 +83,4 @@ class RoomService {
     }
 }
 
-module.exports = new RoomService();
+export default new RoomService();

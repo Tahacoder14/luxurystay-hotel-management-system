@@ -1,5 +1,5 @@
-const multer = require('multer');
-const path = require('path');
+import multer from 'multer';
+import path from 'path';
 
 // Set up storage engine
 const storage = multer.diskStorage({
@@ -30,4 +30,4 @@ function checkFileType(file, cb){
     }
 }
 
-module.exports = upload;
+export default upload;

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const { nanoid } = require('nanoid');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import { nanoid } from 'nanoid';
 
 const UserSchema = new mongoose.Schema({
     uniqueId: { type: String, unique: true },
@@ -33,4 +33,4 @@ UserSchema.pre('save', async function(next) {
     next();
 });
 
-module.exports = mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

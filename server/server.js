@@ -1,30 +1,26 @@
-// Use require for classic Node.js compatibility on Vercel
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const path = require('path');
-const connectDB = require('./config/db');
-const { errorHandler } = require('./middleware/errorHandler');
+// --- Load Environment Variables ---
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import connectDB from './config/db.js';
+import errorHandler from './middleware/errorHandler.js';
 
-// --- Import All Route Handlers ---
-const authRoutes = require('./routes/authRoutes');
-const roomRoutes = require('./routes/roomRoutes');
-const userRoutes = require('./routes/userRoutes');
-const bookingRoutes = require('./routes/bookingRoutes');
-const jobRoutes = require('./routes/jobRoutes');
-const applicationRoutes = require('./routes/applicationRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
-const staffRoutes = require('./routes/staffRoutes');
+  // Routes Imports
 
-// --- Initializations ---
+import authRoutes from './routes/authRoutes.js';
+import roomRoutes from './routes/roomRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import bookingRoutes from './routes/bookingRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import applicationRoutes from './routes/applicationRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import staffRoutes from './routes/staffRoutes.js';
+
 dotenv.config();
+
 const app = express();
 
-// --- Connect to MongoDB ---
-// This is the first thing that happens when the function is invoked.
-// If the MONGO_URI is missing, it will cause an error here.
-connectDB();
-// Connect to MongoDB once during initialization (not per request)
 let isConnected = false;
 if (!isConnected) {
   connectDB().then(() => {
@@ -34,13 +30,13 @@ if (!isConnected) {
     console.error('MongoDB connection error:', error);
   });
 }
-// Setup a professional CORS policy to allow requests from specific origins.
+
 const allowedOrigins = [
-  'http://localhost:3000',                       // Local development
+  'http://localhost:3000',
 ];
+
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g., Postman, server-to-server)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -48,27 +44,15 @@ const corsOptions = {
     }
   },
   optionsSuccessStatus: 200,
-  credentials: true, // Include if using cookies/auth tokens
+  credentials: true,
 };
 
-
-
-
-// --- Core Middleware ---
-app.use(cors(corsOptions)); // Enable CORS for all routes
-app.use(express.json()); // To parse JSON request bodies
-app.use(express.urlencoded({ extended: false })); // To parse form data
-// Configure Express to parse large JSON request bodies for image uploads.
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
 
-
-// --- Static Folder for Image Uploads ---
-// This serves your images from the '/uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// --- Mount API Routes ---
 app.get('/api', (req, res) => res.json({ message: 'Welcome to the LuxuryStay API' }));
-
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
@@ -78,11 +62,10 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/staff', staffRoutes);
 
-// --- Central Error Handling ---
-// This must be the LAST middleware you use.
 app.use(errorHandler);
 
-// --- Export for Vercel ---
-// We do NOT call app.listen(). Vercel handles the server creation.
-// We simply export the configured Express app.
-module.exports = app;
+// Uncomment for local dev
+// const PORT = process.env.PORT || 5001;
+// app.listen(PORT, () => console.log(`SUCCESS: Local server is running smoothly on port ${PORT}`));
+
+export default app;
