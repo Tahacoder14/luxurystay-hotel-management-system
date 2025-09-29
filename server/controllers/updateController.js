@@ -1,4 +1,4 @@
-import Update from '../models/Update,js';
+import Update from '../models/Update.js';
 
 // @desc    Admin creates a new daily update
 export const createUpdate = async (req, res, next) => {
