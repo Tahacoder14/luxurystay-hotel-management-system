@@ -51,6 +51,7 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
+// --- Define Routes ---
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.get('/api', (req, res) => res.json({ message: 'Welcome to the LuxuryStay API' }));
