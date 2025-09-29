@@ -54,6 +54,14 @@ app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.get('/api', (req, res) => res.json({ message: 'Welcome to the LuxuryStay API' }));
+app.get('/api/debug', (req, res) => {
+  res.json({
+    env: {
+      MONGO_URI: !!process.env.MONGO_URI,
+      JWT_SECRET: !!process.env.JWT_SECRET,
+      NODE_ENV: process.env.NODE_ENV}
+  });
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
