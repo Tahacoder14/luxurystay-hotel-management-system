@@ -1,6 +1,6 @@
-import Application from '../models/Application.js';
+import Application from '../models/application.js';
 import User from '../models/User.js';
-import Job from '../models/Job.js';
+import Job from '../models/job.js';
 
 /**
  * @desc    Submit a new job application
