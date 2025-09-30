@@ -89,14 +89,21 @@ class RoomService {
      * @returns {Promise<Document>} The document of the room that was deleted.
      */
     async delete(roomId) {
-        // Since we are not storing files, the delete operation is much simpler.
+        // --- THE DEFINITIVE DELETE FIX ---
+        // With a Data URI-based system, there is no physical file to delete from storage.
+        // The delete operation is a simple, safe database command.
+        
+        // Use findByIdAndDelete which is atomic and reliable.
         const room = await Room.findByIdAndDelete(roomId);
+
+        // If no room was found with that ID, throw a specific error.
         if (!room) {
             throw new Error('Room not found');
         }
         return room;
     }
 }
+
 
 // Export a single, shared instance of the service (Singleton Pattern) using modern ESM syntax.
 export default new RoomService();
