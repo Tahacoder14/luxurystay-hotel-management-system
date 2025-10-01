@@ -51,28 +51,40 @@ export const processApplication = async (req, res, next) => {
 
     try {
         const application = await Application.findById(applicationId).populate('job');
-        if (!application) return res.status(404).json({ message: 'Application not found' });
+        if (!application) {
+            return res.status(404).json({ message: 'Application not found' });
+        }
         
-        // Find the user who submitted the application
+        // --- THE DEFINITIVE FIX ---
+        // Find the user who submitted the application using their email from the application form.
         const applicantUser = await User.findOne({ email: application.email });
-        if (!applicantUser) return res.status(404).json({ message: 'Applicant user profile not found.'});
+        if (!applicantUser && action === 'hire') {
+            return res.status(404).json({ message: 'Cannot hire: The applicant does not have a user account.' });
+        }
 
         if (action === 'hire') {
-            applicantUser.role = 0;
+            // 1. Update the User's role and set their new staff title
+            applicantUser.role = 'Receptionist'; // Default role, you could make this dynamic
             applicantUser.staffDetails = { title: staffTitle || application.job.title, hireDate: new Date() };
             await applicantUser.save();
+            
+            // 2. Update the Job posting status to 'Filled'
             await Job.findByIdAndUpdate(application.job._id, { status: 'Filled' });
+            
+            // 3. Update the Application status to 'Hired'
             application.status = 'Hired';
             await application.save();
-            res.json({ message: 'Applicant hired successfully and moved to staff!' });
-
-        } else if (action === 'reject') {
+            
+            return res.json({ message: 'Applicant hired successfully! Their role has been updated.' });
+        } 
+        
+        if (action === 'reject') {
             application.status = 'Rejected';
             await application.save();
-            res.json({ message: 'Applicant has been rejected.' });
-        } else {
-            res.status(400).json({ message: 'Invalid action specified.' });
-        }
+            return res.json({ message: 'Applicant has been rejected.' });
+        } 
+        
+        res.status(400).json({ message: 'Invalid action specified.' });
     } catch (error) {
         next(error);
     }

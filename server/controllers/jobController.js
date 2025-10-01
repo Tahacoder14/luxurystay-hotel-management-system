@@ -41,7 +41,9 @@ export const deleteJob = async (req, res, next) => {
         if (!job) {
             return res.status(404).json({ message: 'Job not found' });
         }
-        res.json({ message: 'Job deleted successfully' });
+        // Also delete any applications associated with this job
+        await Application.deleteMany({ job: req.params.id });
+        res.json({ message: 'Job posting and associated applications removed.' });
     } catch (error) {
         next(error);
     }
