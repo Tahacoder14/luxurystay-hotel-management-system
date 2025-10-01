@@ -4,6 +4,7 @@ import { checkIn, checkOut, getAllAttendance } from '../controllers/attendanceCo
 import { protect, staff, admin } from '../middleware/authMiddleware.js';
 
 // Staff-specific routes
+
 router.post('/checkin', protect, staff, checkIn);
 router.put('/checkout', protect, staff, checkOut);
 
