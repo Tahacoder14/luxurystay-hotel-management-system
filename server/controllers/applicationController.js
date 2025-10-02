@@ -88,9 +88,9 @@ export const processApplication = async (req, res, next) => {
     }
 };
 
- export const downloadCV = async (req, res, next) => {
+export const downloadCV = async (req, res, next) => {
     try {
-        const application = await Application.findById(req.params.id);
+        const application = await Application.findById(req.params.id).select('cvDataURI name');
         if (!application || !application.cvDataURI) {
             return res.status(404).json({ message: 'CV not found.' });
         }
@@ -99,8 +99,11 @@ export const processApplication = async (req, res, next) => {
         const mimeType = parts[0].split(':')[1];
         const fileContents = Buffer.from(parts[1], 'base64');
         
+        // Determine the file extension
+        const extension = mimeType.includes('pdf') ? 'pdf' : 'docx';
+
         res.setHeader('Content-Type', mimeType);
-        res.setHeader('Content-Disposition', `attachment; filename=CV-${application.name.replace(' ', '_')}-${application._id}.pdf`);
+        res.setHeader('Content-Disposition', `attachment; filename=CV-${application.name.replace(/\s+/g, '_')}-${application._id}.${extension}`);
         res.send(fileContents);
     } catch (error) { next(error); }
 };
