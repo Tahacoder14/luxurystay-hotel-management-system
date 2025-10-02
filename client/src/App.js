@@ -7,13 +7,15 @@ import GuestLayout from './components/common/GuestLayout';
 import AdminLayout from './components/admin/layout/AdminLayout';
 import StaffLayout from './components/staff/StaffLayout';
 
-// --- PAGES ---
+// --- GUEST & AUTH PAGES ---
 import HomePage from './components/guest/HomePage';
 import CareerPage from './components/guest/CareerPage';
 import RoomDetailsPage from './components/guest/RoomDetailsPage';
 import BookingConfirmation from './components/guest/BookingConfirmation';
 import LoginPage from './components/guest/LoginPage';
 import SignupPage from './components/guest/SignupPage';
+
+// --- STAFF PAGES ---
 import StaffDashboard from './components/staff/StaffDashboard';
 
 // --- ADMIN PAGES ---
@@ -25,62 +27,60 @@ import ManageGuests from './components/admin/ManageGuests';
 import ManageJobs from './components/admin/ManageJobs';
 import ViewApplications from './components/admin/ViewApplications';
 import BookingManagement from './components/admin/BookingManagement';
+import ViewSubmissions from './components/admin/ViewSubmissions'; // Correctly imported
 
 // --- PROTECTED ROUTE WRAPPERS ---
 import StaffRoute from './components/routing/StaffRoute';
-import AdminRoute from './components/routing/AdminRoute'; // Import the new AdminRoute
+import AdminRoute from './components/routing/AdminRoute';
+
+// A simple component to handle which layout to show based on the URL.
+const AppContent = () => {
+    return (
+        <Routes>
+            {/* --- GUEST ROUTES (wrapped in GuestLayout) --- */}
+            <Route element={<GuestLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/careers" element={<CareerPage />} />
+                <Route path="/rooms/:id" element={<RoomDetailsPage />} />
+                <Route path="/booking-confirmation/:id" element={<BookingConfirmation />} />
+            </Route>
+            
+            {/* --- AUTH ROUTES (standalone) --- */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+
+            {/* --- ADMIN ROUTES (protected and nested in AdminLayout) --- */}
+            <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="manage-bookings" element={<BookingManagement />} />
+                <Route path="manage-rooms" element={<ManageRooms />} />
+                <Route path="room-list" element={<RoomList />} />
+                <Route path="manage-staff" element={<ManageStaff />} />
+                <Route path="manage-guests" element={<ManageGuests />} />
+                <Route path="manage-jobs" element={<ManageJobs />} />
+                <Route path="view-applications" element={<ViewApplications />} />
+                
+                {/* --- THE DEFINITIVE ROUTE FIX --- */}
+                {/* The path is now correctly set to 'submissions' to match the link */}
+                <Route path="submissions" element={<ViewSubmissions />} />
+            </Route>
+
+            {/* --- STAFF ROUTES (protected and nested in StaffLayout) --- */}
+            <Route path="/staff/dashboard" element={<StaffRoute><StaffLayout /></StaffRoute>}>
+                <Route index element={<StaffDashboard />} />
+            </Route>
+        </Routes>
+    );
+};
 
 function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          {/* --- GUEST ROUTES --- */}
-          <Route element={<GuestLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/careers" element={<CareerPage />} />
-            <Route path="/rooms/:id" element={<RoomDetailsPage />} />
-            <Route path="/booking-confirmation/:id" element={<BookingConfirmation />} />
-          </Route>
-          
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-
-          {/* --- THE DEFINITIVE ADMIN ROUTE FIX --- */}
-          {/* The entire AdminLayout and all its children are now wrapped in the AdminRoute.
-              This guarantees that NO ONE can access any /admin/* page unless they are a logged-in Admin. */}
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-\                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="manage-bookings" element={<BookingManagement />} />
-            <Route path="manage-rooms" element={<ManageRooms />} />
-            <Route path="room-list" element={<RoomList />} />
-            <Route path="manage-staff" element={<ManageStaff />} />
-            <Route path="manage-guests" element={<ManageGuests />} />
-            <Route path="manage-jobs" element={<ManageJobs />} />
-            <Route path="view-applications" element={<ViewApplications />} />
-          </Route>
-
-          {/* --- STAFF ROUTES --- */}
-          <Route
-            path="/staff/dashboard"
-            element={
-              <StaffRoute>
-                <StaffLayout />
-              </StaffRoute>
-            }
-          >
-            <Route index element={<StaffDashboard />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </Router>
-  );
+    return (
+        <Router>
+            <AuthProvider>
+                <AppContent />
+            </AuthProvider>
+        </Router>
+    );
 }
+
 export default App;

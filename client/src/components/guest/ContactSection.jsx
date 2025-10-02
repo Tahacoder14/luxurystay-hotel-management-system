@@ -1,88 +1,69 @@
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
-
-// Animation variants for the two columns
-const slideInLeft = {
-    hidden: { opacity: 0, x: -100 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: 'easeOut' } },
-};
-
-const slideInRight = {
-    hidden: { opacity: 0, x: 100 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: 'easeOut', delay: 0.2 } },
-};
-
+import api from '../../api/api';
+import { FaPaperPlane, FaCommentDots, FaQuestionCircle } from 'react-icons/fa';
 
 const ContactSection = () => {
+    const initialState = { name: '', email: '', message: '', type: 'Inquiry' };
+    const [formData, setFormData] = useState(initialState);
+    const [feedback, setFeedback] = useState({ error: '', success: '' });
+    const [isLoading, setIsLoading] = useState(false);
+
+    const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    const onSubmit = async e => {
+        e.preventDefault();
+        setIsLoading(true);
+        setFeedback({ error: '', success: '' });
+        try {
+            const res = await api.post('/submissions', formData);
+            setFeedback({ success: res.data.message, error: '' });
+            setFormData(initialState);
+        } catch (err) {
+            setFeedback({ error: 'Failed to send message. Please try again.', success: '' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <section id="contact" className="py-20 bg-light-bg">
-            <div className="container mx-auto px-6">
+        <section id="contact" className="py-20 bg-brand-light">
+            <div className="container mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl font-serif font-bold text-primary">Get In Touch</h2>
-                    <p className="text-text-dark mt-2">We would be delighted to hear from you. Please get in touch with any inquiries.</p>
+                    <h2 className="text-4xl font-serif font-bold text-brand-primary">Get In Touch</h2>
+                    <p className="text-text-muted mt-2">Have a question or some feedback? We’d love to hear from you.</p>
                 </div>
-
-                <div className="grid md:grid-cols-2 gap-12 items-start">
-                    {/* Left Column: Contact Information */}
-                    <motion.div
-                        className="space-y-6"
-                        variants={slideInLeft}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                    >
-                        <div className="flex items-start space-x-4">
-                            <FaMapMarkerAlt className="text-secondary text-2xl mt-1" />
-                            <div>
-                                <h3 className="text-xl font-bold text-primary">Our Address</h3>
-                                <p className="text-text-dark">123 Luxury Avenue, Elegance City, 12345</p>
+                <motion.div initial={{ y: 50, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="bg-white p-8 rounded-lg shadow-xl max-w-3xl mx-auto">
+                    <form onSubmit={onSubmit} className="space-y-6">
+                        <div className="text-center">
+                            <label className="text-lg font-semibold text-text-dark">I would like to...</label>
+                            <div className="flex justify-center gap-4 mt-4">
+                                <label className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all ${formData.type === 'Inquiry' ? 'bg-brand-subtle ring-2 ring-brand-accent' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                                    <input type="radio" name="type" value="Inquiry" checked={formData.type === 'Inquiry'} onChange={onChange} className="hidden"/>
+                                    <FaQuestionCircle className={formData.type === 'Inquiry' ? 'text-brand-primary' : 'text-text-muted'} /> Make an Inquiry
+                                </label>
+                                <label className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all ${formData.type === 'Feedback' ? 'bg-brand-subtle ring-2 ring-brand-accent' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                                    <input type="radio" name="type" value="Feedback" checked={formData.type === 'Feedback'} onChange={onChange} className="hidden"/>
+                                    <FaCommentDots className={formData.type === 'Feedback' ? 'text-brand-primary' : 'text-text-muted'} /> Provide Feedback
+                                </label>
                             </div>
                         </div>
-                        <div className="flex items-start space-x-4">
-                            <FaPhone className="text-secondary text-2xl mt-1" />
-                            <div>
-                                <h3 className="text-xl font-bold text-primary">Phone Number</h3>
-                                <p className="text-text-dark">Reservations: (123) 456-7890</p>
-                            </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={onChange} required className="w-full p-3 border rounded-md" />
+                            <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={onChange} required className="w-full p-3 border rounded-md" />
                         </div>
-                        <div className="flex items-start space-x-4">
-                            <FaEnvelope className="text-secondary text-2xl mt-1" />
-                            <div>
-                                <h3 className="text-xl font-bold text-primary">Email</h3>
-                                <p className="text-text-dark">concierge@luxurystay.com</p>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Right Column: Contact Form */}
-                    <motion.div
-                        variants={slideInRight}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                    >
-                        <form className="bg-white p-8 rounded-lg shadow-lg space-y-4">
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-text-dark">Full Name</label>
-                                <input type="text" id="name" className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-transparent transition" />
-                            </div>
-                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-text-dark">Email Address</label>
-                                <input type="email" id="email" className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-transparent transition" />
-                            </div>
-                             <div>
-                                <label htmlFor="message" className="block text-sm font-medium text-text-dark">Message</label>
-                                <textarea id="message" rows="5" className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-transparent transition"></textarea>
-                            </div>
-                            <button type="submit" className="w-full bg-primary text-white font-bold py-3 px-6 rounded-md hover:bg-gray-800 transition-colors transform hover:scale-105">
-                                Send Message
-                            </button>
-                        </form>
-                    </motion.div>
-                </div>
+                        <textarea name="message" placeholder="Your Message..." value={formData.message} onChange={onChange} required rows="5" className="w-full p-3 border rounded-md"></textarea>
+                        
+                        {feedback.error && <p className="text-red-500 text-center">{feedback.error}</p>}
+                        {feedback.success && <p className="text-green-500 text-center">{feedback.success}</p>}
+                        
+                        <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 bg-brand-primary text-white font-bold py-3 rounded-md hover:bg-slate-700 disabled:bg-gray-400">
+                            <FaPaperPlane /> {isLoading ? 'Sending...' : 'Send Message'}
+                        </button>
+                    </form>
+                </motion.div>
             </div>
         </section>
     );
 };
-
 export default ContactSection;

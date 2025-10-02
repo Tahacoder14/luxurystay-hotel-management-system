@@ -1,13 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://luxurystay-hotel-management-system.vercel.app/api',
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Request Interceptor: Adds the token to every outgoing request
+// Request Interceptor: This attaches the auth token to every request. (This part is correct)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -19,19 +17,24 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// --- NEW & IMPORTANT: Response Interceptor ---
-// This watches for incoming responses. If we get a 401 error,
-// it means the token is bad, so we automatically log the user out.
+// --- THE DEFINITIVE AUTHENTICATION FIX ---
+// This is a "Response Interceptor". It watches every response from the server.
 api.interceptors.response.use(
-  (response) => response, // If the response is successful, just pass it along
+  (response) => response, // If the response is successful (2xx status), just pass it through.
   (error) => {
+    // If the server responds with a 401 Unauthorized (meaning the token is expired or invalid)
     if (error.response && error.response.status === 401) {
-      // If we get an Unauthorized error
+      // 1. Remove the bad user data and token from storage.
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Reload the page to reset the app state and redirect to login
+      
+      // 2. Force a page reload to the login screen.
+      // This is the professional way to reset the application state.
       window.location.href = '/login'; 
+      
+      // You can also add a query param to show a message, e.g., '/login?sessionExpired=true'
     }
+    // For all other errors, just pass them along to be handled by the component.
     return Promise.reject(error);
   }
 );

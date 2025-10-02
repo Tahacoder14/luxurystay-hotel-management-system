@@ -1,69 +1,100 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
-import { Link } from 'react-router-dom'; // No longer need useNavigate
-import AuthContext from '../../context/AuthContext'; // Import the AuthContext
+import api from '../../api/api';
+import { Link } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
+import { FiMail, FiLock } from 'react-icons/fi'; // Importing email and lock icons from react-icons
 
 const LoginPage = () => {
-    // Get the login function from our global context
-    const { login } = useContext(AuthContext); 
+    const { login } = useContext(AuthContext);
     
-    // Local state for the form inputs and error messages
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const { email, password } = formData;
     const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const onSubmit = async e => {
         e.preventDefault();
-        setError(''); // Clear previous errors on a new submission
+        setIsLoading(true);
+        setError('');
+        
         try {
-            // Send login credentials to the backend
-                const res = await axios.post('http://localhost:5001/api/auth/login', formData);
-            
-            // On success, call the global login function from the context.
-            // This will handle saving the token, setting the user, and redirecting.
+            const res = await api.post('/auth/login', formData);
             login(res.data.user, res.data.token);
-
         } catch (err) {
-            // If the API call fails, display the error message from the server
-            setError(err.response?.data?.message || 'An error occurred. Please try again.');
+            setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-light-bg p-4">
-            <motion.div 
-                className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-            >
-                <h2 className="text-3xl font-bold font-serif text-primary mb-6 text-center">Welcome Back</h2>
-                <form onSubmit={onSubmit} className="space-y-5">
-                    <div>
-                        <label className="block text-sm font-medium text-text-dark">Email</label>
-                        <input type="email" name="email" value={email} onChange={onChange} required className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-secondary" />
+        <div className="flex w-full min-h-screen flex-wrap">
+            <div className="flex w-full flex-col md:w-1/2 lg:w-1/3">
+                <div className="flex justify-center pt-12 md:-mb-24 md:justify-start md:pl-12">
+                    <a href="#" className="border-b-4 border-b-blue-700 pb-2 text-2xl font-bold text-gray-900">LuxuryStay</a>
+                </div>
+                <div className="my-auto flex flex-col justify-center px-6 pt-8 sm:px-24 md:justify-start md:px-8 md:pt-0 lg:px-12">
+                    <p className="text-center text-3xl font-bold">Welcome</p>
+                    <p className="mt-2 text-center">Login to access your account.</p>
+                    <form onSubmit={onSubmit} className="flex flex-col pt-3 md:pt-8">
+                        <div className="flex flex-col pt-4">
+                            <div className="relative flex overflow-hidden rounded-lg border focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600 transition">
+                                <span className="inline-flex items-center border-r border-gray-300 bg-white px-3 text-sm text-gray-500">
+                                    <FiMail className="w-4 h-4" />
+                                </span>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    value={email} 
+                                    onChange={onChange} 
+                                    required 
+                                    className="w-full flex-1 appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" 
+                                    placeholder="Email" 
+                                />
+                            </div>
+                        </div>
+                        <div className="mb-12 flex flex-col pt-4">
+                            <div className="relative flex overflow-hidden rounded-lg border focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600 transition">
+                                <span className="inline-flex items-center border-r border-gray-300 bg-white px-3 text-sm text-gray-500">
+                                    <FiLock className="w-4 h-4" />
+                                </span>
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    value={password} 
+                                    onChange={onChange} 
+                                    required 
+                                    className="w-full flex-1 appearance-none border-gray-300 bg-white py-2 px-4 text-base text-gray-700 placeholder-gray-400 focus:outline-none" 
+                                    placeholder="Password" 
+                                />
+                            </div>
+                        </div>
+                        
+                        {error && <p className="text-red-500 text-sm text-center font-semibold">{error}</p>}
+                        
+                        <motion.button 
+                            type="submit" 
+                            disabled={isLoading}
+                            className="w-full rounded-lg bg-blue-700 px-4 py-2 text-center text-base font-semibold text-white shadow-md transition ease-in hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                            whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                            whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                        >
+                            {isLoading ? 'Logging in...' : 'Submit'}
+                        </motion.button>
+                    </form>
+                    <div className="pt-12 pb-12 text-center">
+                        <p className="whitespace-nowrap">
+                            Don't have an account? <Link to="/signup" className="font-semibold underline">Register here.</Link>
+                        </p>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-text-dark">Password</label>
-                        <input type="password" name="password" value={password} onChange={onChange} required className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-secondary" />
-                    </div>
-                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                    <motion.button 
-                        type="submit" 
-                        className="w-full bg-primary text-white font-bold py-3 rounded-md hover:bg-gray-800 transition-colors"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                    >
-                        Login
-                    </motion.button>
-                </form>
-                <p className="text-center text-sm text-gray-600 mt-6">
-                    Don't have an account? <Link to="/signup" className="font-medium text-secondary hover:underline">Sign Up</Link>
-                </p>
-            </motion.div>
+                </div>
+            </div>
+            <div className="pointer-events-none hidden select-none bg-black shadow-2xl md:block md:w-2/2 lg:w-2/3">
+                <img className="h-screen w-full object-cover opacity-90" src="/images/login.jpg" alt="Login background" />
+            </div>
         </div>
     );
 };

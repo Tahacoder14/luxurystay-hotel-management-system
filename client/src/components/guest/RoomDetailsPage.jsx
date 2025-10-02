@@ -2,13 +2,11 @@ import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css'; // Essential for date picker styling
+import 'react-datepicker/dist/react-datepicker.css'; // Don't forget this import
 import { differenceInCalendarDays, format } from 'date-fns';
 import AuthContext from '../../context/AuthContext';
 import { FaUserFriends, FaWifi, FaBed, FaMoneyBillWave } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-
-const BACKEND_URL = 'http://localhost:5001';
 
 const RoomDetailsPage = () => {
     const { id } = useParams();
@@ -17,7 +15,7 @@ const RoomDetailsPage = () => {
 
     const [room, setRoom] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isBooking, setIsBooking] = useState(false); // For button loading state
+    const [isBooking, setIsBooking] = useState(false);
     const [checkInDate, setCheckInDate] = useState(new Date());
     const [checkOutDate, setCheckOutDate] = useState(() => {
         const tomorrow = new Date();
@@ -27,10 +25,8 @@ const RoomDetailsPage = () => {
     const [guestData, setGuestData] = useState({
         firstName: '', lastName: '', email: '', phone: '', specialRequests: ''
     });
-
     const [feedback, setFeedback] = useState({ error: '', success: '' });
-    
-    // Effect to pre-fill the form with logged-in user's details for convenience
+
     useEffect(() => {
         if (user) {
             setGuestData(prev => ({
@@ -55,13 +51,11 @@ const RoomDetailsPage = () => {
         };
         fetchRoom();
     }, [id]);
-
+    
     const handleGuestDataChange = (e) => setGuestData({ ...guestData, [e.target.name]: e.target.value });
 
-    // --- THE DEFINITIVE BUG FIX for the non-clickable button ---
     const numberOfNights = useMemo(() => {
         if (!checkInDate || !checkOutDate) return 0;
-        // The typo is corrected here to use checkInDate
         return differenceInCalendarDays(checkOutDate, checkInDate);
     }, [checkInDate, checkOutDate]);
 
@@ -69,42 +63,36 @@ const RoomDetailsPage = () => {
 
     const handleBooking = async () => {
         if (numberOfNights <= 0) {
-            setFeedback({ error: 'Check-out date must be after check-in date.', success: '' });
+            setFeedback({ error: 'Check-out date must be after the check-in date.', success: '' });
             return;
         }
         setIsBooking(true);
-        
-        const bookingData = { 
-            room: room._id, checkInDate, checkOutDate, totalPrice, 
-            guestDetails: guestData 
-        };
+        const bookingData = { room: room._id, checkInDate, checkOutDate, totalPrice, guestDetails: guestData };
         try {
             const res = await api.post('/bookings', bookingData);
-            // On success, navigate to the professional confirmation page
             navigate(`/booking-confirmation/${res.data._id}`);
         } catch (err) {
-            setFeedback({ error: err.response?.data?.message || 'Booking failed. Please check your details.', success: '' });
+            setFeedback({ error: err.response?.data?.message || 'Booking failed. Please try again.', success: '' });
         } finally {
             setIsBooking(false);
         }
     };
 
-    if (isLoading) return <div className="container mx-auto text-center py-20">Loading room details...</div>;
-    if (!room) return <div className="container mx-auto text-center py-20 text-red-500">Room not found.</div>;
+    if (isLoading) return <div className="container mx-auto text-center py-20">Loading Room Details...</div>;
+    if (!room) return <div className="container mx-auto text-center py-20 text-red-500">Sorry, this room could not be found.</div>;
 
-    const imageUrl = `${BACKEND_URL}${room.imageUrl.replace(/\\/g, '/')}`;
+    const imageUrl = room.imageUrl; // The Data URI works directly
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="container mx-auto py-12 md:py-20">
             {feedback.error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-6">{feedback.error}</p>}
             
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
-                {/* --- Left Column (Room Details) - Perfectly Responsive --- */}
                 <div className="lg:col-span-3">
                     <motion.img initial={{ opacity: 0 }} animate={{ opacity: 1 }} src={imageUrl} alt={room.name} className="w-full h-auto max-h-[500px] object-cover rounded-lg shadow-xl mb-6" />
                     <h1 className="text-4xl font-serif text-brand-primary">{room.name}</h1>
                     <p className="text-lg text-text-muted mt-4">{room.description}</p>
-                     <div className="flex flex-wrap items-center text-gray-500 gap-x-6 gap-y-2 mt-6 border-t pt-6">
+                     <div className="flex flex-wrap items-center text-text-muted gap-x-6 gap-y-2 mt-6 border-t pt-6">
                         <div className="flex items-center gap-2"><FaUserFriends size={20} /><span>2 Guests</span></div>
                         <div className="flex items-center gap-2"><FaWifi size={20} /><span>Free WiFi</span></div>
                         <div className="flex items-center gap-2"><FaBed size={20} /><span>{room.type}</span></div>
@@ -112,7 +100,6 @@ const RoomDetailsPage = () => {
                     </div>
                 </div>
 
-                {/* --- Right Column (Booking Form) - Professional UI/UX --- */}
                 <div className="lg:col-span-2">
                     <div className="bg-white p-6 rounded-lg shadow-xl sticky top-28">
                         <h2 className="text-2xl font-bold text-brand-primary mb-6 text-center">Your Reservation</h2>

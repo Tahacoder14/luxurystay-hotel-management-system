@@ -1,39 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom'; // Use Link for the new widget
 import { format } from 'date-fns';
 import api from '../../api/api';
-import { FaSignInAlt, FaSignOutAlt, FaBed, FaUserCheck } from 'react-icons/fa';
+import { FaSignInAlt, FaBed, FaUserCheck, FaEnvelopeOpenText } from 'react-icons/fa';
 
-// A reusable, professional Widget component with a skeleton loading state
-const DashboardWidget = ({ icon, title, value, change, color, isLoading }) => (
-    <div className="bg-admin-card p-6 rounded-lg shadow-md flex items-center justify-between">
-        <div>
-            <p className="text-text-secondary text-sm font-medium">{title}</p>
-            {isLoading ? (
-                <div className="h-9 w-24 bg-gray-200 rounded animate-pulse mt-1"></div>
-            ) : (
-                <>
-                    <p className="text-3xl font-bold text-text-dark mt-1">{value}</p>
-                    <p className={`text-xs mt-1 font-semibold ${color}`}>{change}</p>
-                </>
-            )}
+const DashboardWidget = ({ icon, title, value, change, color, isLoading, isLink = false, to = "/" }) => {
+    const content = (
+        <div className={`bg-admin-card p-6 rounded-lg shadow-md flex items-center justify-between ${isLink ? 'transition-all hover:shadow-xl hover:-translate-y-1' : ''}`}>
+            <div>
+                <p className="text-text-secondary text-sm font-medium">{title}</p>
+                {isLoading ? <div className="h-9 w-24 bg-gray-200 rounded animate-pulse mt-1"></div> : (
+                    <>
+                        <p className="text-3xl font-bold text-text-dark mt-1">{value}</p>
+                        {change && <p className={`text-xs mt-1 font-semibold ${color}`}>{change}</p>}
+                    </>
+                )}
+            </div>
+            <div className={`text-3xl ${color}`}>{icon}</div>
         </div>
-        <div className={`text-3xl ${color}`}>{icon}</div>
-    </div>
-);
+    );
+
+    if (isLink) {
+        return <Link to={to}>{content}</Link>;
+    }
+    return content;
+};
+
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({});
     const [recentGuests, setRecentGuests] = useState([]);
+    const [newSubmissionsCount, setNewSubmissionsCount] = useState(0); // New state for submissions
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Fetch all data from our single, efficient endpoint
-                const res = await api.get('/dashboard');
-                setStats(res.data);
-                setRecentGuests(res.data.recentGuests);
+                // Fetch dashboard stats AND submissions concurrently for speed
+                const [statsRes, submissionsRes] = await Promise.all([
+                    api.get('/dashboard'),
+                    api.get('/submissions?status=New') // A new backend route might be needed for this filtering
+                ]);
+                
+                setStats(statsRes.data);
+                setRecentGuests(statsRes.data.recentGuests);
+                setNewSubmissionsCount(submissionsRes.data.length); // Count the new messages
             } catch (error) { 
                 console.error("Failed to fetch dashboard data:", error);
             } finally {
@@ -43,21 +55,22 @@ const AdminDashboard = () => {
         fetchDashboardData();
     }, []);
 
-    // Helper to prevent NaN errors before data is loaded
-    const roomsAvailable = stats.totalRooms ? (stats.totalRooms - stats.occupiedRooms) : 0;
-    const roomsReserved = stats.occupiedRooms || 0;
+    // ... Helper functions and other logic ...
+    const roomsAvailable = useMemo(() => stats.totalRooms ? (stats.totalRooms - stats.occupiedRooms) : 0, [stats]);
+    const roomsReserved = useMemo(() => stats.occupiedRooms || 0, [stats]);
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <h1 className="text-3xl font-bold text-text-dark mb-6">Overview</h1>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <DashboardWidget icon={<FaSignInAlt />} title="Today's Check In" value={stats.todaysCheckIns || 0} change="+24% Last 7 Days" color="text-status-green-text" isLoading={isLoading} />
-                <DashboardWidget icon={<FaSignOutAlt />} title="Today's Check Out" value="21" change="-11% Last 7 Days" color="text-status-red-text" isLoading={isLoading} />
+                {/* --- THE NEW, LINKED WIDGET --- */}
+                <DashboardWidget icon={<FaEnvelopeOpenText />} title="New Submissions" value={newSubmissionsCount} color="text-admin-primary" isLoading={isLoading} isLink={true} to="/admin/submissions" />
+                
+                <DashboardWidget icon={<FaSignInAlt />} title="Today's Check In" value={stats.todaysCheckIns || 0} change="+24%" color="text-status-green-text" isLoading={isLoading} />
                 <DashboardWidget icon={<FaBed />} title="Rooms Available" value={roomsAvailable} change={`Total: ${stats.totalRooms || 0}`} color="text-admin-primary" isLoading={isLoading} />
                 <DashboardWidget icon={<FaUserCheck />} title="Rooms Reserved" value={roomsReserved} change={`${stats.occupancyRate || 0}% Occupancy`} color="text-admin-primary" isLoading={isLoading} />
             </div>
-
             <div className="mt-10">
                 <h2 className="text-2xl font-bold text-text-dark mb-4">Guest List</h2>
                 <div className="bg-admin-card rounded-lg shadow-md overflow-x-auto">

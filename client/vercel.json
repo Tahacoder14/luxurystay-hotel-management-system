@@ -2,17 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "./package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "config": { "distDir": "build" }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://your-hotel-api-server.vercel.app/$1"
+      "dest": "https://luxurystay-hotel-management-system.vercel.app/api"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",

@@ -1,59 +1,61 @@
 import { motion } from 'framer-motion';
-import { FaSwimmingPool, FaSpa, FaDumbbell, FaWifi, FaUtensils, FaParking } from 'react-icons/fa';
+import { FaSwimmingPool, FaSpa, FaDumbbell, FaUtensils, FaWifi, FaParking } from 'react-icons/fa';
 
-// Dummy data for the amenities. This makes it clean and easy to add more later.
+// Updated amenities data with enhanced descriptions
 const amenitiesList = [
     {
         icon: <FaSwimmingPool />,
         title: "Infinity Pool",
-        description: "Breathtaking city views from our stunning rooftop infinity pool."
+        description: "Dive into luxury with our rooftop infinity pool, offering breathtaking city views and a serene escape."
     },
     {
         icon: <FaSpa />,
         title: "Serenity Spa",
-        description: "Indulge in our world-class spa with a full range of revitalizing treatments."
+        description: "Rejuvenate with world-class treatments in our tranquil spa, designed for ultimate relaxation."
     },
     {
         icon: <FaDumbbell />,
         title: "Fitness Center",
-        description: "State-of-the-art equipment available 24/7 for your fitness needs."
+        description: "Stay fit with 24/7 access to cutting-edge equipment in our state-of-the-art gym."
     },
     {
         icon: <FaUtensils />,
         title: "Gourmet Dining",
-        description: "Experience exquisite cuisine at our award-winning in-house restaurant."
+        description: "Savor exquisite dishes crafted by award-winning chefs at our signature restaurant."
     },
     {
         icon: <FaWifi />,
         title: "High-Speed Wi-Fi",
-        description: "Complimentary high-speed internet access throughout the hotel."
+        description: "Stay connected with complimentary, ultra-fast Wi-Fi available throughout the property."
     },
     {
         icon: <FaParking />,
         title: "Valet Parking",
-        description: "Secure and convenient valet parking for all our esteemed guests."
+        description: "Enjoy hassle-free, secure valet parking tailored for your convenience."
     }
 ];
 
-// Animation variant for the container to orchestrate staggered children
+// Container animation for staggered entrance
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.2 // This will make each child animate 0.2s after the previous one
+            staggerChildren: 0.15,
+            delayChildren: 0.2
         }
     }
 };
 
-// Animation variant for each amenity item
+// Item animation for smooth scaling and fade-in
 const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0, scale: 0.95 },
     visible: {
         y: 0,
         opacity: 1,
+        scale: 1,
         transition: {
-            duration: 0.6,
+            duration: 0.5,
             ease: "easeOut"
         }
     }
@@ -61,31 +63,46 @@ const itemVariants = {
 
 const AmenitiesSection = () => {
     return (
-        <section id="amenities" className="py-20 bg-white">
-            <div className="container mx-auto px-6 text-center">
-                <h2 className="text-4xl font-serif font-bold text-primary mb-2">Unparalleled Amenities</h2>
-                <p className="text-text-dark max-w-2xl mx-auto mb-12">Every detail is crafted for your comfort and delight.</p>
+        <section id="amenities" className="py-16 sm:py-24 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-brand-primary">
+                        World-Class Amenities
+                    </h2>
+                    <p className="mt-4 text-lg sm:text-xl text-brand-accent max-w-3xl mx-auto">
+                        Experience unparalleled luxury with amenities designed to elevate your stay.
+                    </p>
+                </div>
 
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }} // Trigger when 20% of the section is in view
+                    viewport={{ once: true, amount: 0.3 }}
                 >
                     {amenitiesList.map((amenity, index) => (
                         <motion.div
                             key={index}
-                            className="bg-light-bg p-8 rounded-lg shadow-md text-left flex items-start space-x-4"
+                            className="relative bg-white rounded-xl shadow-lg p-6 sm:p-8 hover:shadow-xl transition-shadow duration-300"
                             variants={itemVariants}
+                            whileHover={{ y: -5, transition: { duration: 0.2 } }}
                         >
-                            <div className="text-secondary text-4xl">
-                                {amenity.icon}
+                            <div className="flex items-start space-x-4">
+                                <div className="text-4xl text-brand-primary">
+                                    {amenity.icon}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl sm:text-2xl font-bold text-brand-primary mb-2">
+                                        {amenity.title}
+                                    </h3>
+                                    <p className="text-brand-accent text-sm sm:text-base leading-relaxed">
+                                        {amenity.description}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-primary mb-2">{amenity.title}</h3>
-                                <p className="text-text-dark">{amenity.description}</p>
-                            </div>
+                            {/* Subtle decorative accent */}
+                            <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary rounded-l-xl"></div>
                         </motion.div>
                     ))}
                 </motion.div>

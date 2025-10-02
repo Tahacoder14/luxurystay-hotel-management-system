@@ -6,7 +6,7 @@ import { useReactToPrint,} from 'react-to-print';
 import { motion } from 'framer-motion';
 import { FaPrint, FaCheckCircle } from 'react-icons/fa';
 
-const BACKEND_URL = 'http://localhost:5001';
+const BACKEND_URL = 'https://luxurystay-hotel-management-system.vercel.app/api/bookings';
 
 // --- The Professional, Printable Invoice Component ---
 // Defined outside the main component for cleanliness and to ensure the ref works reliably.
@@ -82,7 +82,7 @@ const BookingConfirmation = () => {
             if (!id) return;
             setIsLoading(true);
             try {
-                const res = await api.get(`/bookings/${id}`);
+                const res = await api.get(`https://luxurystay-hotel-management-system.vercel.app/api/bookings/${id}`);
                 setBooking(res.data);
             } catch (error) {
                 console.error("Failed to fetch booking details:", error);
