@@ -12,7 +12,7 @@ const RoomCard = ({ room, index }) => {
     const imageUrl = room.imageUrl;
 
     const handleNavigateToDetails = (roomId) => {
-        navigate(`/rooms/${roomId}`);
+        navigate(`https://luxurystay-hotel-management-system.vercel.app/api/rooms/${roomId}`);
     };
 
     return (
@@ -73,7 +73,7 @@ const RoomsSection = () => {
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const res = await api.get('/rooms');
+                const res = await api.get('https://luxurystay-hotel-management-system.vercel.app/api/rooms');
                 setAllRooms(res.data);
             } catch (err) {
                 setError('Could not load available rooms at this time. Please try again later.');
