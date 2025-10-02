@@ -34,18 +34,21 @@ if (!isConnected) {
 }
 
 const allowedOrigins = [
-  'https://luxurystay-hotel-management-system-omega.vercel.app/',
+  'http://localhost:3000',  // For your local development
+  process.env.FRONTEND_URL    // This will be your live Vercel frontend URL
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like Postman) or from our allowed list
+    // Allow requests from our list and requests with no origin (like Postman).
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('This origin is not allowed by CORS'));
+      callback(new Error('This origin is not allowed by our CORS policy'));
     }
   },
+  optionsSuccessStatus: 200,
+  credentials: true, // Include if using cookies/auth tokens
 }));
 
 app.use(cors());
