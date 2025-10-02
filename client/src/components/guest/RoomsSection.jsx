@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
-import { FaShoppingCart, FaWifi, FaUserFriends, FaBed } from 'react-icons/fa';
+import { FaShoppingCart, FaWifi, FaUserFriends} from 'react-icons/fa';
 
 // --- The Professional, Reusable, and Data-Driven Room Card ---
 const RoomCard = ({ room, index }) => {

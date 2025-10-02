@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 import api from '../../api/api';
 import { format } from 'date-fns';
-import { FaRegCalendarCheck, FaRegCalendarTimes, FaPhone, FaEnvelope, FaUser } from 'react-icons/fa';
+import { FaRegCalendarCheck, FaEnvelope, FaUser } from 'react-icons/fa';
 
 const BookingManagement = () => {
     const [bookings, setBookings] = useState([]);

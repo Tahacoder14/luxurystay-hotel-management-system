@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Don't forget this import
-import { differenceInCalendarDays, format } from 'date-fns';
+import { differenceInCalendarDays} from 'date-fns';
 import AuthContext from '../../context/AuthContext';
 import { FaUserFriends, FaWifi, FaBed, FaMoneyBillWave } from 'react-icons/fa';
 import { motion } from 'framer-motion';
