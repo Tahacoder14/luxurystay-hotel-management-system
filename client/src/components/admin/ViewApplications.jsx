@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '../../api/api';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 import { format } from 'date-fns';
 import { FaDownload, FaCheck, FaTimes } from 'react-icons/fa';
 import HireModal from './layout/HireModal'; // Import the new professional modal
 
 const ViewApplications = () => {
-    const [applications, setApplications] = useState([]);
+    const [applications, setApplications] = useState([]); // Explicitly used in fetchApplications
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState('Pending');
     const [feedback, setFeedback] = useState({ error: '', success: '' });
@@ -22,7 +22,7 @@ const ViewApplications = () => {
         setIsLoading(true);
         try {
             const res = await api.get('/applications');
-            setApplications(res.data);
+            setApplications(res.data); // ESLint should recognize this usage
         } catch (err) {
             setTempFeedback('Failed to fetch applications.', true);
         } finally {

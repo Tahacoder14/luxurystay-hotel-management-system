@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    FaHome, FaUserFriends, FaCalendarAlt, FaBed, FaBriefcase, FaFileAlt, 
+    FaHome, FaUserFriends, FaCalendarAlt,FaBriefcase, FaFileAlt, 
     FaPlus, FaList, FaUserShield, FaChevronLeft 
 } from 'react-icons/fa';
 import AdminHeader from './AdminHeader';

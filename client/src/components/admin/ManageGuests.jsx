@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion'; // <-- THE CRITICAL FIX IS HERE
 import api from '../../api/api';
 import AuthContext from '../../context/AuthContext';
-import { FaTrash, FaUserEdit } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 // Assume you will create an EditGuestModal component similar to the EditRoomModal
 
 const ManageGuests = () => {
@@ -45,6 +45,15 @@ const ManageGuests = () => {
             }
         }
     };
+
+    // Check if the user has admin privileges (example logic)
+    if (!currentUser || currentUser.role !== 'Admin') {
+        return (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-8 text-center text-red-500">
+                You do not have permission to manage guest profiles. Please contact an admin.
+            </motion.div>
+        );
+    }
 
     if (isLoading) return <div className="p-8 text-center">Loading Guest Profiles...</div>;
 

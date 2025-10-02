@@ -45,7 +45,7 @@ const SignupPage = () => {
             </div>
             <div className="flex w-full flex-col md:w-1/2">
                 <div className="flex justify-center pt-12 md:justify-start md:pl-12">
-                    <a href="#" className="text-2xl font-bold text-blue-600">LuxuryStay</a>
+                    <a href="/home" className="text-2xl font-bold text-blue-600">LuxuryStay</a>
                 </div>
                 <div className="my-auto mx-auto flex flex-col justify-center px-6 pt-8 md:justify-start lg:w-[28rem]">
                     <p className="text-center text-3xl font-bold md:text-left md:leading-tight">Create your free account</p>

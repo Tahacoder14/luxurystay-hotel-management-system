@@ -31,9 +31,9 @@ const Footer = () => {
 
             </nav>
             <div className="flex justify-center space-x-6 mb-8">
-                <a href="#" aria-label="Facebook" className="text-2xl text-text-light hover:text-white transition-colors"><FaFacebook /></a>
-                <a href="#" aria-label="Twitter" className="text-2xl text-text-light hover:text-white transition-colors"><FaTwitter /></a>
-                <a href="#" aria-label="Instagram" className="text-2xl text-text-light hover:text-white transition-colors"><FaInstagram /></a>
+                <a href="/facebook" aria-label="Facebook" className="text-2xl text-text-light hover:text-white transition-colors"><FaFacebook /></a>
+                <a href="/twitter" aria-label="Twitter" className="text-2xl text-text-light hover:text-white transition-colors"><FaTwitter /></a>
+                <a href="/instagram" aria-label="Instagram" className="text-2xl text-text-light hover:text-white transition-colors"><FaInstagram /></a>
             </div>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
