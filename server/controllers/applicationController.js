@@ -53,8 +53,6 @@ export const processApplication = async (req, res, next) => {
             return res.status(404).json({ message: 'Application not found' });
         }
         
-        // --- THE DEFINITIVE FIX ---
-        // Find the user who submitted the application using their email from the application form.
         const applicantUser = await User.findOne({ email: application.email });
         if (!applicantUser && action === 'hire') {
             return res.status(404).json({ message: 'Cannot hire: The applicant does not have a user account.' });
@@ -62,18 +60,19 @@ export const processApplication = async (req, res, next) => {
 
         if (action === 'hire') {
             // 1. Update the User's role and set their new staff title
-            applicantUser.role = 'Receptionist'; // Default role, you could make this dynamic
+            applicantUser.role = 'Receptionist'; // You can make this dynamic if needed
             applicantUser.staffDetails = { title: staffTitle || application.job.title, hireDate: new Date() };
             await applicantUser.save();
             
-            // 2. Update the Job posting status to 'Filled'
+            // --- THE NEW, SMART FUNCTIONALITY ---
+            // 2. Update the Job posting status to 'Filled' automatically
             await Job.findByIdAndUpdate(application.job._id, { status: 'Filled' });
             
             // 3. Update the Application status to 'Hired'
             application.status = 'Hired';
             await application.save();
             
-            return res.json({ message: 'Applicant hired successfully! Their role has been updated.' });
+            return res.json({ message: 'Applicant hired successfully! Job posting has been marked as Filled.' });
         } 
         
         if (action === 'reject') {
