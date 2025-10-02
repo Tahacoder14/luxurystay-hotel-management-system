@@ -9,23 +9,21 @@ import Job from '../models/job.js';
  */
 export const createApplication = async (req, res, next) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'A CV file is required.' });
-        }
-        const applicationData = {
-            ...req.body,
-            cv: req.file.buffer,           // Store the file as Buffer
-            cvType: req.file.mimetype,     // Store the MIME type
-            // cvPath is now optional/legacy, you can leave it out or set to null
-        };
+        if (!req.file) return res.status(400).json({ message: 'A CV file is required.' });
+        
+        // --- THE `memoryStorage` CV FIX ---
+        const cvDataURI = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        
+        const applicationData = { ...req.body, cvDataURI };
+        applicationData.cvMimeType = req.file.mimetype;
+        applicationData.cvOriginalName = req.file.originalname;
+        
+        // --- END CV FIX ---
         const application = new Application(applicationData);
         await application.save();
-        res.status(201).json({ message: 'Application submitted successfully!' });
-    } catch (error) {
-        next(error);
-    }
+        res.status(201).json({ message: 'Application submitted!' });
+    } catch (error) { next(error); }
 };
-
 /**
  * @desc    Get all job applications
  * @route   GET /api/applications
@@ -88,4 +86,21 @@ export const processApplication = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+ export const downloadCV = async (req, res, next) => {
+    try {
+        const application = await Application.findById(req.params.id);
+        if (!application || !application.cvDataURI) {
+            return res.status(404).json({ message: 'CV not found.' });
+        }
+        // This professional method decodes the Data URI and sends it as a proper file download
+        const parts = application.cvDataURI.split(';base64,');
+        const mimeType = parts[0].split(':')[1];
+        const fileContents = Buffer.from(parts[1], 'base64');
+        
+        res.setHeader('Content-Type', mimeType);
+        res.setHeader('Content-Disposition', `attachment; filename=CV-${application.name.replace(' ', '_')}-${application._id}.pdf`);
+        res.send(fileContents);
+    } catch (error) { next(error); }
 };

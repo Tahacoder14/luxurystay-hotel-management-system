@@ -25,14 +25,12 @@ const ApplicationSchema = new mongoose.Schema({
         trim: true
     },
     // --- CV fields for serverless ---
-    cv: { 
-        type: Buffer // Store the CV file as a Buffer
-    },
-    cvType: {
-        type: String // Store the MIME type (e.g., 'application/pdf')
-    },
+    cvDataURI: { type: String, required: true },
+    cvMimeType: { type: String, required: true },
+    cvOriginalName: { type: String, required: true },
+    // --- END CV fields for serverless ---
     // Keep cvPath for backward compatibility, but make it optional
-    cvPath: { 
+    cvPath: {
         type: String
     },
     status: {
