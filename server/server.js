@@ -34,7 +34,7 @@ if (!isConnected) {
 }
 
 const allowedOrigins = [
-  'http://localhost:3000',
+  'https://luxurystay-hotel-management-system-omega.vercel.app/',
 ];
 
 app.use(cors({
