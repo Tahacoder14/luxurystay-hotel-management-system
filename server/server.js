@@ -17,6 +17,7 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import staffRoutes from './routes/staffRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import submissionRoutes from './routes/submissionRoutes.js';
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/submissions', submissionRoutes);
 
 app.use(errorHandler);
 
