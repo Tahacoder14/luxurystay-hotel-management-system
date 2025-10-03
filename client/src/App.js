@@ -39,11 +39,13 @@ const AppContent = () => {
         <Routes>
             {/* --- GUEST ROUTES (wrapped in GuestLayout) --- */}
             <Route element={<GuestLayout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/careers" element={<CareerPage />} />
-                <Route path="/rooms/:id" element={<RoomDetailsPage />} />
-                <Route path="/booking-confirmation/:id" element={<BookingConfirmation />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/careers" element={<CareerPage />} />
+            {/* A standalone '/rooms' route is not needed, as the homepage contains the RoomsSection */}
+            <Route path="/rooms/:id" element={<RoomDetailsPage />} />
+            <Route path="/booking-confirmation/:id" element={<BookingConfirmation />} />
             </Route>
+
             
             {/* --- AUTH ROUTES (standalone) --- */}
             <Route path="/login" element={<LoginPage />} />

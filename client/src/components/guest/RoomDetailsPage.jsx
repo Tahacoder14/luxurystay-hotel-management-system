@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css'; // Don't forget this import
+import 'react-datepicker/dist/react-datepicker.css'; // This is essential for the date picker styling
 import { differenceInCalendarDays} from 'date-fns';
 import AuthContext from '../../context/AuthContext';
 import { FaUserFriends, FaWifi, FaBed, FaMoneyBillWave } from 'react-icons/fa';
@@ -26,7 +26,8 @@ const RoomDetailsPage = () => {
         firstName: '', lastName: '', email: '', phone: '', specialRequests: ''
     });
     const [feedback, setFeedback] = useState({ error: '', success: '' });
-
+    
+    // Effect to pre-fill the form with the logged-in user's details for convenience
     useEffect(() => {
         if (user) {
             setGuestData(prev => ({
@@ -38,14 +39,19 @@ const RoomDetailsPage = () => {
         }
     }, [user]);
 
+    // Effect to fetch the specific room's data from the backend
     useEffect(() => {
         const fetchRoom = async () => {
+            setIsLoading(true);
             try {
                 const res = await api.get(`/rooms/${id}`);
                 setRoom(res.data);
             } catch (err) {
-                setFeedback({ error: 'Could not find room details.', success: '' });
+                setFeedback({ error: 'Could not find room details. It may no longer be available.', success: '' });
             } finally {
+                // --- THE DEFINITIVE FIX for "stuck on loading" ---
+                // This 'finally' block GUARANTEES that the loading state is turned off,
+                // whether the API call succeeds or fails. The page will never get stuck.
                 setIsLoading(false);
             }
         };
@@ -54,6 +60,7 @@ const RoomDetailsPage = () => {
     
     const handleGuestDataChange = (e) => setGuestData({ ...guestData, [e.target.name]: e.target.value });
 
+    // useMemo for performance: These values only recalculate when their dependencies change.
     const numberOfNights = useMemo(() => {
         if (!checkInDate || !checkOutDate) return 0;
         return differenceInCalendarDays(checkOutDate, checkInDate);
@@ -61,33 +68,43 @@ const RoomDetailsPage = () => {
 
     const totalPrice = useMemo(() => room ? numberOfNights * room.price : 0, [numberOfNights, room]);
 
+    // The definitive, fully connected booking handler
     const handleBooking = async () => {
         if (numberOfNights <= 0) {
             setFeedback({ error: 'Check-out date must be after the check-in date.', success: '' });
             return;
         }
         setIsBooking(true);
-        const bookingData = { room: room._id, checkInDate, checkOutDate, totalPrice, guestDetails: guestData };
+        const bookingData = { 
+            room: room._id, 
+            checkInDate, 
+            checkOutDate, 
+            totalPrice, 
+            guestDetails: guestData 
+        };
         try {
             const res = await api.post('/bookings', bookingData);
+            // --- THE DEFINITIVE REDIRECTION ---
+            // On success, flawlessly navigate to the confirmation page.
             navigate(`/booking-confirmation/${res.data._id}`);
         } catch (err) {
-            setFeedback({ error: err.response?.data?.message || 'Booking failed. Please try again.', success: '' });
+            setFeedback({ error: err.response?.data?.message || 'Booking failed. Please check all details and try again.', success: '' });
         } finally {
             setIsBooking(false);
         }
     };
 
-    if (isLoading) return <div className="container mx-auto text-center py-20">Loading Room Details...</div>;
-    if (!room) return <div className="container mx-auto text-center py-20 text-red-500">Sorry, this room could not be found.</div>;
+    if (isLoading) return <div className="container mx-auto text-center py-20 text-text-muted">Loading...</div>;
+    if (!room) return <div className="container mx-auto text-center py-20 text-red-500">{feedback.error || "Room not found."}</div>;
 
-    const imageUrl = room.imageUrl; // The Data URI works directly
+    const imageUrl = room.imageUrl; // The Data URI from your backend works directly
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="container mx-auto py-12 md:py-20">
-            {feedback.error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-6">{feedback.error}</p>}
+            {feedback.error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-6 animate-pulse">{feedback.error}</p>}
             
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+                {/* --- Left Column (Room Showcase) --- */}
                 <div className="lg:col-span-3">
                     <motion.img initial={{ opacity: 0 }} animate={{ opacity: 1 }} src={imageUrl} alt={room.name} className="w-full h-auto max-h-[500px] object-cover rounded-lg shadow-xl mb-6" />
                     <h1 className="text-4xl font-serif text-brand-primary">{room.name}</h1>
@@ -100,6 +117,7 @@ const RoomDetailsPage = () => {
                     </div>
                 </div>
 
+                {/* --- Right Column (Booking Hub) --- */}
                 <div className="lg:col-span-2">
                     <div className="bg-white p-6 rounded-lg shadow-xl sticky top-28">
                         <h2 className="text-2xl font-bold text-brand-primary mb-6 text-center">Your Reservation</h2>
